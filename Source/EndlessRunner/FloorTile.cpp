@@ -5,6 +5,7 @@
 #include "Components/ArrowComponent.h"
 #include "Components/BoxComponent.h"
 #include <Kismet/GameplayStatics.h>
+#include "RunnerGameModeBase.h"
 #include "RunnerCharacter.h"
 
 // Sets default values
@@ -39,10 +40,16 @@ AFloorTile::AFloorTile()
 
 }
 
+
 // Called when the game starts or when spawned
 void AFloorTile::BeginPlay()
 {
 	Super::BeginPlay();
+
+	RunGameMode = Cast<ARunnerGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
+	check(RunGameMode);
+
+	FloorTriggerBox->OnComponentBeginOverlap.AddDynamic(this, &AFloorTile::OnTriggerBoxOverlap);
 
 }
 
@@ -53,3 +60,25 @@ void AFloorTile::Tick(float DeltaTime)
 
 }
 
+
+void AFloorTile::OnTriggerBoxOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	ARunnerCharacter* RunCharacter = Cast<ARunnerCharacter>(OtherActor);
+	if (RunCharacter)
+	{
+		RunGameMode->AddFloorTile();
+
+
+		GetWorldTimerManager().SetTimer(DestroyHandle, this, &AFloorTile::DestroyFloorTile, 2.f, false);
+	}
+}
+
+void AFloorTile::DestroyFloorTile()
+{
+	if (DestroyHandle.IsValid())
+	{
+		GetWorldTimerManager().ClearTimer(DestroyHandle);
+	}
+
+	this->Destroy();
+}
