@@ -18,8 +18,39 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"));
 	class UCameraComponent* Camera;
 
+	UPROPERTY(VisibleInstanceOnly)
+	class ARunnerGameModeBase* RunGameMode;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input", meta = (AllowPrivateAccess = "true"));
+	class UInputMappingContext* DefaultMappingContext;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input", meta = (AllowPrivateAccess = "true"));
+	class UInputAction* JumpAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input", meta = (AllowPrivateAccess = "true"));
+	class UInputAction* MoveRightAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input", meta = (AllowPrivateAccess = "true"));
+	class UInputAction* MoveLeftAction;
+
+
 
 public:
+	UPROPERTY(VisibleInstanceOnly,BlueprintReadWrite)
+	int32 CurrentLane = 1;
+
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadWrite)
+	int32 NextLane = 0;
+
+	UFUNCTION(BlueprintImplementableEvent, Category = "Lane")
+	void ChangeLane();
+
+	UFUNCTION(BlueprintCallable, Category = "Lane")
+	void ChangeLaneUpdate(float Value);
+
+	UFUNCTION(BlueprintCallable, Category = "Lane")
+	void ChangeLaneFinished();
+
 	// Sets default values for this character's properties
 	ARunnerCharacter();
 
@@ -27,8 +58,11 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	void MoveLeft();
+	UFUNCTION()
 	void MoveRight();
+
+	UFUNCTION()
+	void MoveLeft();
 
 
 public:	

@@ -25,11 +25,14 @@ public:
 	UPROPERTY(VisibleInstanceOnly, Category = "Runtime")
 	FTransform NextSpawnPoint;
 
+	UPROPERTY(VisibleInstanceOnly, Category = "Runtime")
+	TArray<float> LaneSwitchValues;
+
 	UFUNCTION(BlueprintCallable)
 	void CreateInitalFloorTiles();
 
 	UFUNCTION(BlueprintCallable)
-	void AddFloorTile();
+	AFloorTile* AddFloorTile();
 
 protected:
 	virtual void BeginPlay() override;

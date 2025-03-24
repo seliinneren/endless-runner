@@ -2,9 +2,18 @@
 
 
 #include "RunnerCharacter.h"
+#include "Engine/LocalPlayer.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Components/CapsuleComponent.h"
+#include "RunnerGameModeBase.h"
+#include "EnhancedInputComponent.h"
+#include "EnhancedInputSubsystems.h"
+#include "InputActionValue.h"
+#include <Kismet/GameplayStatics.h>
+
+
 
 
 // Sets default values
@@ -28,8 +37,21 @@ ARunnerCharacter::ARunnerCharacter()
 void ARunnerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+
+	RunGameMode = Cast<ARunnerGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
+	check(RunGameMode);
+
+	if (APlayerController* PlayerController = Cast<APlayerController>(GetController()))
+	{
+		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
+		{
+			Subsystem->AddMappingContext(DefaultMappingContext, 0);
+		}
+	}
 	
 }
+
+
 
 
 // Called every frame
@@ -50,23 +72,40 @@ void ARunnerCharacter::Tick(float DeltaTime)
 // Called to bind functionality to input
 void ARunnerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
+	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent)) {
+		// Assuming JumpAction is a UInputAction* defined in your character class
+		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ARunnerCharacter::Jump);
+		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ARunnerCharacter::StopJumping);
 
-	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ARunnerCharacter::Jump);
-	PlayerInputComponent->BindAction("Jump", IE_Released, this, &ARunnerCharacter::StopJumping);
-
-	PlayerInputComponent->BindAction("MoveLeft", IE_Pressed, this, &ARunnerCharacter::MoveLeft);
-	PlayerInputComponent->BindAction("MoveRight", IE_Pressed, this, &ARunnerCharacter::MoveRight);
-
+		EnhancedInputComponent->BindAction(MoveRightAction, ETriggerEvent::Started, this, &ARunnerCharacter::MoveRight);
+		EnhancedInputComponent->BindAction(MoveLeftAction, ETriggerEvent::Started, this, &ARunnerCharacter::MoveLeft);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("PlayerInputComponent is not an EnhancedInputComponent!"));
+	}
 }
 
-
-void ARunnerCharacter::MoveLeft()
+void ARunnerCharacter::ChangeLaneUpdate(const float Value)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Move Left"));
+	FVector Location = GetCapsuleComponent()->GetComponentLocation();
+	Location.Y = FMath::Lerp(RunGameMode->LaneSwitchValues[CurrentLane], RunGameMode->LaneSwitchValues[NextLane], Value);
+	SetActorLocation(Location);
+}
+
+void ARunnerCharacter::ChangeLaneFinished()
+{
+	CurrentLane = NextLane;
 }
 
 void ARunnerCharacter::MoveRight()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Move Right"));
+	NextLane = FMath::Clamp(CurrentLane + 1, 0, 2);
+	ChangeLane();
+}
+
+void ARunnerCharacter::MoveLeft()
+{
+	NextLane = FMath::Clamp(CurrentLane - 1, 0, 2);
+	ChangeLane();
 }

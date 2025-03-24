@@ -10,13 +10,25 @@ void ARunnerGameModeBase::BeginPlay()
 
 void ARunnerGameModeBase::CreateInitalFloorTiles()
 {
+	AFloorTile* Tile = AddFloorTile();
+	if (Tile)
+	{
+		LaneSwitchValues.Add(Tile->LeftLane->GetComponentLocation().Y);
+		LaneSwitchValues.Add(Tile->CenterLane->GetComponentLocation().Y);
+		LaneSwitchValues.Add(Tile->RightLane->GetComponentLocation().Y);
+	}
+	for (float Val : LaneSwitchValues)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Lane Switch Value: %f"), Val);
+	}
+
 	for (int i = 0; i < NumInitalFloorTiles; i++)
 	{
 		AddFloorTile();
 	}
 }
 
-void ARunnerGameModeBase::AddFloorTile()
+AFloorTile* ARunnerGameModeBase::AddFloorTile()
 {
 	UWorld* World = GetWorld();
 	if (World)
@@ -27,7 +39,9 @@ void ARunnerGameModeBase::AddFloorTile()
 		{
 			NextSpawnPoint = Tile->GetAttachTransform();
 		}
+		return Tile;
 	}
+	return nullptr;
 }
 
 
