@@ -32,7 +32,7 @@ public:
 	void CreateInitalFloorTiles();
 
 	UFUNCTION(BlueprintCallable)
-	AFloorTile* AddFloorTile();
+	AFloorTile* AddFloorTile(const bool bSpawnItems);
 
 protected:
 	virtual void BeginPlay() override;
