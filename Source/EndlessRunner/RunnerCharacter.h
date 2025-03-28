@@ -36,6 +36,13 @@ protected:
 
 
 public:
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Assets")
+	class UParticleSystem* DeathParticleSystem;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Assets")
+	class USoundBase* DeathSound;
+
 	UPROPERTY(VisibleInstanceOnly,BlueprintReadWrite)
 	int32 CurrentLane = 1;
 
@@ -51,6 +58,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Lane")
 	void ChangeLaneFinished();
 
+	UFUNCTION(BlueprintCallable)
+	void Death();
+
 	// Sets default values for this character's properties
 	ARunnerCharacter();
 
@@ -59,11 +69,19 @@ protected:
 	virtual void BeginPlay() override;
 
 	UFUNCTION()
+	void OnDeath();
+
+	UFUNCTION()
 	void MoveRight();
 
 	UFUNCTION()
 	void MoveLeft();
 
+	UPROPERTY()
+	FTimerHandle RestartTimerHandle;
+
+	UPROPERTY()
+	bool bIsDeath = false;
 
 public:	
 	// Called every frame

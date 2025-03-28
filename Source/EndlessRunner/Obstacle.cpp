@@ -1,6 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Obstacle.h"
+#include "RunnerCharacter.h"
 
 // Sets default values
 AObstacle::AObstacle()
@@ -17,6 +18,12 @@ AObstacle::AObstacle()
 
 void AObstacle::OnObstacleHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
+	ARunnerCharacter* RunnerCharacter = Cast<ARunnerCharacter>(OtherActor);
+
+	if (RunnerCharacter)
+	{
+		RunnerCharacter->Death();
+	}
 }
 
 

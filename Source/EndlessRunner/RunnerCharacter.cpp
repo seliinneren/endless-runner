@@ -19,7 +19,7 @@
 // Sets default values
 ARunnerCharacter::ARunnerCharacter()
 {
- 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 	CameraArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraArm"));
@@ -30,7 +30,7 @@ ARunnerCharacter::ARunnerCharacter()
 
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	Camera->bUsePawnControlRotation = false;
-	Camera->SetupAttachment(CameraArm,USpringArmComponent::SocketName);
+	Camera->SetupAttachment(CameraArm, USpringArmComponent::SocketName);
 }
 
 // Called when the game starts or when spawned
@@ -48,10 +48,8 @@ void ARunnerCharacter::BeginPlay()
 			Subsystem->AddMappingContext(DefaultMappingContext, 0);
 		}
 	}
-	
+
 }
-
-
 
 
 // Called every frame
@@ -96,6 +94,49 @@ void ARunnerCharacter::ChangeLaneUpdate(const float Value)
 void ARunnerCharacter::ChangeLaneFinished()
 {
 	CurrentLane = NextLane;
+}
+
+void ARunnerCharacter::Death()
+{
+	if (!bIsDeath)
+	{
+
+		const FVector Location = GetActorLocation();
+
+		UWorld* World = GetWorld();
+
+		if (World)
+		{
+			bIsDeath = true;
+			DisableInput(nullptr);
+
+			if (DeathParticleSystem)
+			{
+				UGameplayStatics::SpawnEmitterAtLocation(World, DeathParticleSystem, Location);
+			}
+
+			if (DeathSound)
+			{
+				UGameplayStatics::PlaySoundAtLocation(World, DeathSound, Location);
+			}
+
+			GetMesh()->SetVisibility(false);
+
+			World->GetTimerManager().SetTimer(RestartTimerHandle, this, &ARunnerCharacter::OnDeath, 1.f);
+		}
+	}
+}
+
+void ARunnerCharacter::OnDeath()
+{
+	bIsDeath = false;
+
+	if (RestartTimerHandle.IsValid())
+	{
+		GetWorldTimerManager().ClearTimer(RestartTimerHandle);
+	}
+
+	UKismetSystemLibrary::ExecuteConsoleCommand(GetWorld(), TEXT("RestartLevel"));
 }
 
 void ARunnerCharacter::MoveRight()
