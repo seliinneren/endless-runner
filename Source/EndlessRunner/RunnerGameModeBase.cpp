@@ -52,4 +52,11 @@ AFloorTile* ARunnerGameModeBase::AddFloorTile(const bool bSpawnItems)
 	return nullptr;
 }
 
+void ARunnerGameModeBase::AddCoin()
+{
+	TotalCoins += 1;
+
+	UE_LOG(LogTemp, Warning, TEXT("Total Coins: %d"), TotalCoins);
+}
+
 

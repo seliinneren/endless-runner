@@ -1,5 +1,5 @@
 // Fill out your copyright notice in the Description page of Project Settings.
-
+class ACoinItem;
 class AObstacle;
 #pragma once
 #include "CoreMinimal.h"
@@ -23,6 +23,9 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Config")
     TSubclassOf<AObstacle> BigObstacleClass;
 
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Config")
+    TSubclassOf<ACoinItem> CoinItemClass;
+
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
     USceneComponent* SceneComponent;
 
@@ -43,6 +46,15 @@ public:
 
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
     UBoxComponent* FloorTriggerBox;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Config")
+    float SpawnPercent1 = 0.1f;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Config")
+    float SpawnPercent2 = 0.3f;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Config")
+    float SpawnPercent3 = 0.5f;
 
     UFUNCTION()
     void SpawnItems();

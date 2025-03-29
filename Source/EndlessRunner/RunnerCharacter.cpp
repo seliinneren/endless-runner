@@ -52,6 +52,12 @@ void ARunnerCharacter::BeginPlay()
 }
 
 
+void ARunnerCharacter::AddCoin()
+{
+
+	RunGameMode->AddCoin();
+}
+
 // Called every frame
 void ARunnerCharacter::Tick(float DeltaTime)
 {

@@ -8,6 +8,7 @@
 #include <Kismet/KismetMathLibrary.h>
 #include "RunnerGameModeBase.h"
 #include "Obstacle.h"
+#include "CoinItem.h"
 #include "RunnerCharacter.h"
 
 
@@ -56,7 +57,7 @@ void AFloorTile::BeginPlay()
 
 void AFloorTile::SpawnItems()
 {
-	if (IsValid(SmallObstacleClass) && IsValid(BigObstacleClass))
+	if (IsValid(SmallObstacleClass) && IsValid(BigObstacleClass) && IsValid(CoinItemClass))
 	{
 		SpawnLaneItem(CenterLane);
 		SpawnLaneItem(LeftLane);
@@ -72,13 +73,17 @@ void AFloorTile::SpawnLaneItem(UArrowComponent* Lane)
 
 	const FTransform SpawnTransform = Lane->GetComponentTransform();
 
-	if (UKismetMathLibrary::InRange_FloatFloat(RandVal, 0.5f, 0.75f, true, true))
+	if (UKismetMathLibrary::InRange_FloatFloat(RandVal, SpawnPercent1, SpawnPercent2, true, true))
 	{
 		AObstacle* Obstacle = GetWorld()->SpawnActor<AObstacle>(SmallObstacleClass, SpawnTransform, SpawnParameters);
 	}
-	else if (UKismetMathLibrary::InRange_FloatFloat(RandVal, 0.75f, 1.f, true, true))
+	else if (UKismetMathLibrary::InRange_FloatFloat(RandVal, SpawnPercent2, SpawnPercent3, true, true))
 	{
 		AObstacle* Obstacle = GetWorld()->SpawnActor<AObstacle>(BigObstacleClass, SpawnTransform, SpawnParameters);
+	}
+	else if (UKismetMathLibrary::InRange_FloatFloat(RandVal, SpawnPercent3, 1.f, true, true))
+	{
+		ACoinItem* Coin = GetWorld()->SpawnActor<ACoinItem>(CoinItemClass, SpawnTransform, SpawnParameters);
 	}
 }
 
