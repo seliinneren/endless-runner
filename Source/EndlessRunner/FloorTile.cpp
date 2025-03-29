@@ -15,7 +15,7 @@
 // Sets default values
 AFloorTile::AFloorTile()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 	SceneComponent = CreateDefaultSubobject<USceneComponent>(TEXT("Scene"));
@@ -59,16 +59,17 @@ void AFloorTile::SpawnItems()
 {
 	if (IsValid(SmallObstacleClass) && IsValid(BigObstacleClass) && IsValid(CoinItemClass))
 	{
-		SpawnLaneItem(CenterLane);
-		SpawnLaneItem(LeftLane);
-		SpawnLaneItem(RightLane);
+		int32 NumBigs = 0;
+		SpawnLaneItem(CenterLane, NumBigs);
+		SpawnLaneItem(LeftLane, NumBigs);
+		SpawnLaneItem(RightLane, NumBigs);
 	}
 }
 
-void AFloorTile::SpawnLaneItem(UArrowComponent* Lane)
+void AFloorTile::SpawnLaneItem(UArrowComponent* Lane, int32& NumBigs)
 {
 	const float RandVal = FMath::FRandRange(0.f, 1.f);
-	FActorSpawnParameters SpawnParameters;	
+	FActorSpawnParameters SpawnParameters;
 	SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
 	const FTransform SpawnTransform = Lane->GetComponentTransform();
@@ -79,7 +80,19 @@ void AFloorTile::SpawnLaneItem(UArrowComponent* Lane)
 	}
 	else if (UKismetMathLibrary::InRange_FloatFloat(RandVal, SpawnPercent2, SpawnPercent3, true, true))
 	{
-		AObstacle* Obstacle = GetWorld()->SpawnActor<AObstacle>(BigObstacleClass, SpawnTransform, SpawnParameters);
+		if (NumBigs < 2) 
+		{
+			AObstacle* Obstacle = GetWorld()->SpawnActor<AObstacle>(BigObstacleClass, SpawnTransform, SpawnParameters);
+
+			if (Obstacle)
+			{
+				NumBigs += 1;
+			}
+		}
+		else
+		{
+			AObstacle* Obstacle = GetWorld()->SpawnActor<AObstacle>(SmallObstacleClass, SpawnTransform, SpawnParameters);
+		}
 	}
 	else if (UKismetMathLibrary::InRange_FloatFloat(RandVal, SpawnPercent3, 1.f, true, true))
 	{

@@ -83,6 +83,7 @@ void ARunnerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 
 		EnhancedInputComponent->BindAction(MoveRightAction, ETriggerEvent::Started, this, &ARunnerCharacter::MoveRight);
 		EnhancedInputComponent->BindAction(MoveLeftAction, ETriggerEvent::Started, this, &ARunnerCharacter::MoveLeft);
+		EnhancedInputComponent->BindAction(MoveDownAction, ETriggerEvent::Started, this, &ARunnerCharacter::MoveDown);
 	}
 	else
 	{
@@ -155,4 +156,10 @@ void ARunnerCharacter::MoveLeft()
 {
 	NextLane = FMath::Clamp(CurrentLane - 1, 0, 2);
 	ChangeLane();
+}
+
+void ARunnerCharacter::MoveDown()
+{
+	static FVector Impulse = FVector(0.f, 0.f, MoveDownImpulse);
+	GetCharacterMovement()->AddImpulse(Impulse, true);
 }

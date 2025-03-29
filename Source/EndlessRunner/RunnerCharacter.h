@@ -33,6 +33,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input", meta = (AllowPrivateAccess = "true"));
 	class UInputAction* MoveLeftAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input", meta = (AllowPrivateAccess = "true"));
+	class UInputAction* MoveDownAction;
+
 
 
 public:
@@ -42,6 +45,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Assets")
 	class USoundBase* DeathSound;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float MoveDownImpulse = -1000.f;
 
 	UPROPERTY(VisibleInstanceOnly,BlueprintReadWrite)
 	int32 CurrentLane = 1;
@@ -76,6 +82,9 @@ protected:
 
 	UFUNCTION()
 	void MoveLeft();
+
+	UFUNCTION()
+	void MoveDown();
 
 	UPROPERTY()
 	FTimerHandle RestartTimerHandle;
