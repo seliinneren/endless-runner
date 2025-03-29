@@ -4,11 +4,12 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
-#include "FloorTile.h"
 #include "RunnerGameModeBase.generated.h"
-/**
- * 
- */
+
+class AFloorTile;
+class UUserWidget;
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCoinsCountChanged, int32, CoinsCount);
+
 UCLASS()
 class ENDLESSRUNNER_API ARunnerGameModeBase : public AGameModeBase
 {
@@ -17,7 +18,13 @@ class ENDLESSRUNNER_API ARunnerGameModeBase : public AGameModeBase
 public:
 
 	UPROPERTY(EditAnywhere, Category = "Config")
+	TSubclassOf<UUserWidget> GameHudClass;
+
+	UPROPERTY(EditAnywhere, Category = "Config")
 	TSubclassOf<AFloorTile> FloorTileClass;
+
+	UPROPERTY(VisibleInstanceOnly, Category = "Runtime")
+	class UGameHud* GameHud;
 
 	UPROPERTY(VisibleAnywhere)
 	int32 TotalCoins = 0;
@@ -30,6 +37,9 @@ public:
 
 	UPROPERTY(VisibleInstanceOnly, Category = "Runtime")
 	TArray<float> LaneSwitchValues;
+
+	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = "Delegates")
+	FOnCoinsCountChanged OnCoinsCountChanged;
 
 	UFUNCTION(BlueprintCallable)
 	void CreateInitalFloorTiles();

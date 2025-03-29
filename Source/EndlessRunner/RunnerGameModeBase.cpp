@@ -1,10 +1,22 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "RunnerGameModeBase.h"
+
+#include "Kismet/GameplayStatics.h"
+#include "GameHud.h"
+#include "FloorTile.h"
 
 void ARunnerGameModeBase::BeginPlay()
 {
+    UGameplayStatics::GetPlayerController(GetWorld(), 0)->bShowMouseCursor = true;
+
+	GameHud = Cast<UGameHud>(CreateWidget(GetWorld(), GameHudClass));
+	check(GameHud);
+
+	GameHud->InitializeHUD(this);
+
+	GameHud->AddToViewport();
+
 	CreateInitalFloorTiles();
 }
 
@@ -56,7 +68,6 @@ void ARunnerGameModeBase::AddCoin()
 {
 	TotalCoins += 1;
 
-	UE_LOG(LogTemp, Warning, TEXT("Total Coins: %d"), TotalCoins);
+	OnCoinsCountChanged.Broadcast(TotalCoins);
 }
-
 
