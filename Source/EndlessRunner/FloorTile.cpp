@@ -77,6 +77,8 @@ void AFloorTile::SpawnLaneItem(UArrowComponent* Lane, int32& NumBigs)
 	if (UKismetMathLibrary::InRange_FloatFloat(RandVal, SpawnPercent1, SpawnPercent2, true, true))
 	{
 		AObstacle* Obstacle = GetWorld()->SpawnActor<AObstacle>(SmallObstacleClass, SpawnTransform, SpawnParameters);
+
+		ChildActors.Add(Obstacle);
 	}
 	else if (UKismetMathLibrary::InRange_FloatFloat(RandVal, SpawnPercent2, SpawnPercent3, true, true))
 	{
@@ -88,15 +90,18 @@ void AFloorTile::SpawnLaneItem(UArrowComponent* Lane, int32& NumBigs)
 			{
 				NumBigs += 1;
 			}
+			ChildActors.Add(Obstacle);
 		}
 		else
 		{
 			AObstacle* Obstacle = GetWorld()->SpawnActor<AObstacle>(SmallObstacleClass, SpawnTransform, SpawnParameters);
+			ChildActors.Add(Obstacle);
 		}
 	}
 	else if (UKismetMathLibrary::InRange_FloatFloat(RandVal, SpawnPercent3, 1.f, true, true))
 	{
 		ACoinItem* Coin = GetWorld()->SpawnActor<ACoinItem>(CoinItemClass, SpawnTransform, SpawnParameters);
+		ChildActors.Add(Coin);
 	}
 }
 
@@ -120,6 +125,17 @@ void AFloorTile::DestroyFloorTile()
 	{
 		GetWorldTimerManager().ClearTimer(DestroyHandle);
 	}
+
+	for (auto Child : ChildActors) 
+	{
+		if (IsValid(Child))
+		{
+			Child->Destroy();
+		}
+	}
+
+	ChildActors.Empty();
+	RunGameMode->RemoveTile(this);
 
 	this->Destroy();
 }

@@ -86,8 +86,14 @@ protected:
 	UFUNCTION()
 	void MoveDown();
 
+	UFUNCTION()
+	void ResetLevel();
+
 	UPROPERTY()
 	FTimerHandle RestartTimerHandle;
+
+	UPROPERTY()
+	class APlayerStart* PlayerStart;
 
 	UPROPERTY()
 	bool bIsDeath = false;

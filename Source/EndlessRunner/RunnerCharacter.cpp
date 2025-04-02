@@ -11,6 +11,7 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
+#include "GameFramework/PlayerStart.h"
 #include <Kismet/GameplayStatics.h>
 
 
@@ -40,6 +41,10 @@ void ARunnerCharacter::BeginPlay()
 
 	RunGameMode = Cast<ARunnerGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
 	check(RunGameMode);
+
+	RunGameMode->OnLevelReset.AddDynamic(this, &ARunnerCharacter::ResetLevel);
+
+	PlayerStart = Cast<APlayerStart>(UGameplayStatics::GetActorOfClass(GetWorld(),APlayerStart::StaticClass()));
 
 	if (APlayerController* PlayerController = Cast<APlayerController>(GetController()))
 	{
@@ -143,7 +148,24 @@ void ARunnerCharacter::OnDeath()
 		GetWorldTimerManager().ClearTimer(RestartTimerHandle);
 	}
 
-	UKismetSystemLibrary::ExecuteConsoleCommand(GetWorld(), TEXT("RestartLevel"));
+	RunGameMode->PlayerDied();
+}
+
+void ARunnerCharacter::ResetLevel()
+{
+	bIsDeath = false;
+	EnableInput(nullptr);
+	GetMesh()->SetVisibility(true);
+
+	if (PlayerStart)
+	{
+		SetActorLocation(PlayerStart->GetActorLocation());
+		SetActorRotation(PlayerStart->GetActorRotation());
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("No PlayerStart found!"));
+	}
 }
 
 void ARunnerCharacter::MoveRight()
@@ -163,3 +185,5 @@ void ARunnerCharacter::MoveDown()
 	static FVector Impulse = FVector(0.f, 0.f, MoveDownImpulse);
 	GetCharacterMovement()->AddImpulse(Impulse, true);
 }
+
+

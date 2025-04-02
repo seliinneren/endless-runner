@@ -6,9 +6,10 @@
 #include "GameHud.h"
 #include "FloorTile.h"
 
+
 void ARunnerGameModeBase::BeginPlay()
 {
-    UGameplayStatics::GetPlayerController(GetWorld(), 0)->bShowMouseCursor = true;
+	UGameplayStatics::GetPlayerController(GetWorld(), 0)->bShowMouseCursor = true;
 
 	GameHud = Cast<UGameHud>(CreateWidget(GetWorld(), GameHudClass));
 	check(GameHud);
@@ -16,6 +17,8 @@ void ARunnerGameModeBase::BeginPlay()
 	GameHud->InitializeHUD(this);
 
 	GameHud->AddToViewport();
+
+	NumberOfLives = MaxLives;
 
 	CreateInitalFloorTiles();
 }
@@ -46,15 +49,18 @@ void ARunnerGameModeBase::CreateInitalFloorTiles()
 AFloorTile* ARunnerGameModeBase::AddFloorTile(const bool bSpawnItems)
 {
 	UWorld* World = GetWorld();
+
 	if (World)
 	{
 		AFloorTile* Tile = World->SpawnActor<AFloorTile>(FloorTileClass, NextSpawnPoint);
 
 		if (Tile)
 		{
+			FloorTiles.Add(Tile);
+
 			if (bSpawnItems)
 			{
-				 Tile->SpawnItems();
+				Tile->SpawnItems();
 			}
 
 			NextSpawnPoint = Tile->GetAttachTransform();
@@ -70,4 +76,34 @@ void ARunnerGameModeBase::AddCoin()
 
 	OnCoinsCountChanged.Broadcast(TotalCoins);
 }
+
+void ARunnerGameModeBase::PlayerDied()
+{
+	NumberOfLives -= 1;
+	OnLivesCountChanged.Broadcast(NumberOfLives);
+	if (NumberOfLives > 0)
+	{
+		for (auto Tile : FloorTiles)
+		{
+			Tile->DestroyFloorTile();
+		}
+		FloorTiles.Empty();
+
+		NextSpawnPoint = FTransform();
+
+		CreateInitalFloorTiles();
+
+		OnLevelReset.Broadcast();
+	}
+	else
+	{
+		UGameplayStatics::OpenLevel(GetWorld(), FName(*GetWorld()->GetName()), true);
+	}
+}
+
+void ARunnerGameModeBase::RemoveTile(AFloorTile* Tile)
+{
+	FloorTiles.Remove(Tile);
+}
+
 

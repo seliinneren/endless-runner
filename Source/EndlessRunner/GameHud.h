@@ -18,8 +18,22 @@ class ENDLESSRUNNER_API UGameHud : public UUserWidget
 
 protected:
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TSubclassOf<class UUserWidget> PauseMenuWidgetClass;
+
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
 	class UTextBlock* CoinsCount;
+
+	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
+	class UTextBlock* LivesCount;
+
+	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
+	class UButton* PauseBtn;
+
+	UFUNCTION()
+	void OnPauseBtnClick();
+
+	virtual void NativeConstruct() override;
 
 public:
 	UFUNCTION(BlueprintCallable)
@@ -27,4 +41,7 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void SetCoinsCount(int32 Count);
+
+	UFUNCTION(BlueprintCallable)
+	void SetLivesCount(int32 Count);
 };
