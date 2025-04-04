@@ -141,7 +141,6 @@ void ARunnerCharacter::Death()
 
 void ARunnerCharacter::OnDeath()
 {
-	bIsDeath = false;
 
 	if (RestartTimerHandle.IsValid())
 	{

@@ -70,6 +70,8 @@ AFloorTile* ARunnerGameModeBase::AddFloorTile(const bool bSpawnItems)
 	return nullptr;
 }
 
+
+
 void ARunnerGameModeBase::AddCoin()
 {
 	TotalCoins += 1;
@@ -97,7 +99,20 @@ void ARunnerGameModeBase::PlayerDied()
 	}
 	else
 	{
-		UGameplayStatics::OpenLevel(GetWorld(), FName(*GetWorld()->GetName()), true);
+		GameOver();
+	}
+}
+
+void ARunnerGameModeBase::GameOver()
+{
+	if (IsValid(GameOverScreenClass)) 
+	{	
+		UUserWidget* Widget = CreateWidget(GetWorld(), GameOverScreenClass);
+
+		if (Widget) 
+		{
+			Widget->AddToViewport();
+		}
 	}
 }
 

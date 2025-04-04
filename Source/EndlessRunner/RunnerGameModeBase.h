@@ -25,6 +25,9 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Config")
 	TSubclassOf<AFloorTile> FloorTileClass;
 
+	UPROPERTY(EditAnywhere, Category = "Config")
+	TSubclassOf<UUserWidget> GameOverScreenClass;
+
 	UPROPERTY(VisibleInstanceOnly, Category = "Runtime")
 	class UGameHud* GameHud;
 
@@ -64,6 +67,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	AFloorTile* AddFloorTile(const bool bSpawnItems);
 
+	UFUNCTION(BlueprintCallable)
+	void GameOver();
+	
 	UFUNCTION(BlueprintCallable)
 	void AddCoin();
 
