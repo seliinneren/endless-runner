@@ -12,10 +12,8 @@
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
 #include "GameFramework/PlayerStart.h"
+#include "GameFramework/PlayerController.h"
 #include <Kismet/GameplayStatics.h>
-
-
-
 
 // Sets default values
 ARunnerCharacter::ARunnerCharacter()
@@ -39,6 +37,16 @@ void ARunnerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
+	APlayerController* PC = UGameplayStatics::GetPlayerController(this, 0);
+	if (PC)
+	{
+		FInputModeGameAndUI InputMode;
+		InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
+		InputMode.SetHideCursorDuringCapture(false);
+
+		PC->SetInputMode(InputMode);
+		PC->bShowMouseCursor = true;
+	}
 	RunGameMode = Cast<ARunnerGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
 	check(RunGameMode);
 
@@ -89,6 +97,10 @@ void ARunnerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 		EnhancedInputComponent->BindAction(MoveRightAction, ETriggerEvent::Started, this, &ARunnerCharacter::MoveRight);
 		EnhancedInputComponent->BindAction(MoveLeftAction, ETriggerEvent::Started, this, &ARunnerCharacter::MoveLeft);
 		EnhancedInputComponent->BindAction(MoveDownAction, ETriggerEvent::Started, this, &ARunnerCharacter::MoveDown);
+
+		EnhancedInputComponent->BindAction(TouchAction, ETriggerEvent::Started, this, &ARunnerCharacter::OnTouchStarted);
+		EnhancedInputComponent->BindAction(TouchAction, ETriggerEvent::Triggered, this, &ARunnerCharacter::OnTouchTriggered);
+		EnhancedInputComponent->BindAction(TouchAction, ETriggerEvent::Completed, this, &ARunnerCharacter::OnTouchCompleted);
 	}
 	else
 	{
@@ -183,6 +195,69 @@ void ARunnerCharacter::MoveDown()
 {
 	static FVector Impulse = FVector(0.f, 0.f, MoveDownImpulse);
 	GetCharacterMovement()->AddImpulse(Impulse, true);
+}
+
+void ARunnerCharacter::OnTouchStarted(const FInputActionInstance& Instance)
+{
+	bIsTouchTriggered = true;
+}
+
+void ARunnerCharacter::OnTouchTriggered(const FInputActionInstance& Instance)
+{
+	if (!bIsTouchTriggered) return;
+
+	if (TouchStart2D.IsZero())
+	{
+		TouchStart2D = Instance.GetValue().Get<FVector2D>();
+	}
+
+	TouchCurrent2D = Instance.GetValue().Get<FVector2D>();
+
+}
+
+void ARunnerCharacter::OnTouchCompleted(const FInputActionInstance& Instance)
+{
+
+	if (!bIsTouchTriggered) return;
+
+	TouchEnd2D = TouchCurrent2D;
+	bIsTouchTriggered = false;
+
+	FVector2D Delta = TouchEnd2D - TouchStart2D;
+
+	/*const float SwipeThreshold = 50.0f;*/
+	const float DeadZone = 10.0f; 
+
+	if (Delta.Size() < DeadZone)
+	{
+		Jump(); 
+		return;
+	}
+
+	/*Delta = Delta.GetSafeNormal();*/
+
+	if (FMath::Abs(Delta.X) > FMath::Abs(Delta.Y))
+	{
+		if (Delta.X > 0.5f) 
+		{
+			MoveRight();
+		}
+		else if (Delta.X < -0.5f) 
+		{
+			MoveLeft();
+		}
+	}
+	else
+	{
+		if (Delta.Y > 0.5f) 
+		{
+			MoveDown();
+		}
+		else if (Delta.Y < -0.5f) 
+		{
+			Jump();
+		}
+	}
 }
 
 

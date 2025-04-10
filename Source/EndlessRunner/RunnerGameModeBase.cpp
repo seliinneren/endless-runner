@@ -9,7 +9,6 @@
 
 void ARunnerGameModeBase::BeginPlay()
 {
-	UGameplayStatics::GetPlayerController(GetWorld(), 0)->bShowMouseCursor = true;
 
 	GameHud = Cast<UGameHud>(CreateWidget(GetWorld(), GameHudClass));
 	check(GameHud);
@@ -83,18 +82,25 @@ void ARunnerGameModeBase::PlayerDied()
 {
 	NumberOfLives -= 1;
 	OnLivesCountChanged.Broadcast(NumberOfLives);
+
 	if (NumberOfLives > 0)
 	{
-		for (auto Tile : FloorTiles)
+		// 1. Döngüyü GERÝYE DOÐRU ve INDEX ile yap
+		for (int32 i = FloorTiles.Num() - 1; i >= 0; i--)
 		{
-			Tile->DestroyFloorTile();
+			AFloorTile* Tile = FloorTiles[i];
+			if (Tile != nullptr)
+			{
+				// 2. Tile'ý yok et
+				Tile->DestroyFloorTile();
+			}
 		}
+
+		// 3. Diziyi temizle (Empty() güvenli hale geldi)
 		FloorTiles.Empty();
 
 		NextSpawnPoint = FTransform();
-
 		CreateInitalFloorTiles();
-
 		OnLevelReset.Broadcast();
 	}
 	else
