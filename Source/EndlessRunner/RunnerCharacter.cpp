@@ -1,5 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 
 #include "RunnerCharacter.h"
 #include "Engine/LocalPlayer.h"
@@ -15,10 +13,8 @@
 #include "GameFramework/PlayerController.h"
 #include <Kismet/GameplayStatics.h>
 
-// Sets default values
 ARunnerCharacter::ARunnerCharacter()
 {
-	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 	CameraArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraArm"));
@@ -32,7 +28,6 @@ ARunnerCharacter::ARunnerCharacter()
 	Camera->SetupAttachment(CameraArm, USpringArmComponent::SocketName);
 }
 
-// Called when the game starts or when spawned
 void ARunnerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
@@ -71,7 +66,6 @@ void ARunnerCharacter::AddCoin()
 	RunGameMode->AddCoin();
 }
 
-// Called every frame
 void ARunnerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
@@ -86,17 +80,9 @@ void ARunnerCharacter::Tick(float DeltaTime)
 
 }
 
-// Called to bind functionality to input
 void ARunnerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent)) {
-		// Assuming JumpAction is a UInputAction* defined in your character class
-		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ARunnerCharacter::Jump);
-		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ARunnerCharacter::StopJumping);
-
-		EnhancedInputComponent->BindAction(MoveRightAction, ETriggerEvent::Started, this, &ARunnerCharacter::MoveRight);
-		EnhancedInputComponent->BindAction(MoveLeftAction, ETriggerEvent::Started, this, &ARunnerCharacter::MoveLeft);
-		EnhancedInputComponent->BindAction(MoveDownAction, ETriggerEvent::Started, this, &ARunnerCharacter::MoveDown);
 
 		EnhancedInputComponent->BindAction(TouchAction, ETriggerEvent::Started, this, &ARunnerCharacter::OnTouchStarted);
 		EnhancedInputComponent->BindAction(TouchAction, ETriggerEvent::Triggered, this, &ARunnerCharacter::OnTouchTriggered);
@@ -199,7 +185,10 @@ void ARunnerCharacter::MoveDown()
 
 void ARunnerCharacter::OnTouchStarted(const FInputActionInstance& Instance)
 {
+
 	bIsTouchTriggered = true;
+	TouchStart2D = Instance.GetValue().Get<FVector2D>();
+	TouchEnd2D = FVector2D::ZeroVector; 
 }
 
 void ARunnerCharacter::OnTouchTriggered(const FInputActionInstance& Instance)
@@ -224,17 +213,6 @@ void ARunnerCharacter::OnTouchCompleted(const FInputActionInstance& Instance)
 	bIsTouchTriggered = false;
 
 	FVector2D Delta = TouchEnd2D - TouchStart2D;
-
-	/*const float SwipeThreshold = 50.0f;*/
-	const float DeadZone = 10.0f; 
-
-	if (Delta.Size() < DeadZone)
-	{
-		Jump(); 
-		return;
-	}
-
-	/*Delta = Delta.GetSafeNormal();*/
 
 	if (FMath::Abs(Delta.X) > FMath::Abs(Delta.Y))
 	{

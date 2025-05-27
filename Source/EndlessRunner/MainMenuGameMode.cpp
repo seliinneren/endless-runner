@@ -7,7 +7,6 @@
 
 void AMainMenuGameMode::BeginPlay()
 {
-	/*UGameplayStatics::GetPlayerController(GetWorld(), 0)->bShowMouseCursor = true;*/
 
 	if(IsValid(MainMenuWidgetClass)){
 

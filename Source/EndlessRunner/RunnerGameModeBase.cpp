@@ -31,10 +31,6 @@ void ARunnerGameModeBase::CreateInitalFloorTiles()
 		LaneSwitchValues.Add(Tile->CenterLane->GetComponentLocation().Y);
 		LaneSwitchValues.Add(Tile->RightLane->GetComponentLocation().Y);
 	}
-	/*for (float Val : LaneSwitchValues)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Lane Switch Value: %f"), Val);
-	}*/
 
 	AddFloorTile(false);
 	AddFloorTile(false);
@@ -85,18 +81,14 @@ void ARunnerGameModeBase::PlayerDied()
 
 	if (NumberOfLives > 0)
 	{
-		// 1. Döngüyü GERÝYE DOÐRU ve INDEX ile yap
 		for (int32 i = FloorTiles.Num() - 1; i >= 0; i--)
 		{
 			AFloorTile* Tile = FloorTiles[i];
 			if (Tile != nullptr)
 			{
-				// 2. Tile'ý yok et
 				Tile->DestroyFloorTile();
 			}
 		}
-
-		// 3. Diziyi temizle (Empty() güvenli hale geldi)
 		FloorTiles.Empty();
 
 		NextSpawnPoint = FTransform();

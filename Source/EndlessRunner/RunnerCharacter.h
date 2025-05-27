@@ -25,18 +25,6 @@ class ARunnerGameModeBase* RunGameMode;
 UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input", meta = (AllowPrivateAccess = "true"));
 class UInputMappingContext* DefaultMappingContext;
 
-UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input", meta = (AllowPrivateAccess = "true"));
-class UInputAction* JumpAction;
-
-UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input", meta = (AllowPrivateAccess = "true"));
-class UInputAction* MoveRightAction;
-
-UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input", meta = (AllowPrivateAccess = "true"));
-class UInputAction* MoveLeftAction;
-
-UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input", meta = (AllowPrivateAccess = "true"));
-class UInputAction* MoveDownAction;
-
 UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input");
 class UInputAction* TouchAction;
 
@@ -69,11 +57,10 @@ void ChangeLaneFinished();
 UFUNCTION(BlueprintCallable)
 void Death();
 
-// Sets default values for this character's properties
 ARunnerCharacter();
 
 protected:
-// Called when the game starts or when spawned
+
 virtual void BeginPlay() override;
 
 UFUNCTION()
@@ -126,10 +113,8 @@ public:
 UFUNCTION()
 void AddCoin();
 
-// Called every frame
 virtual void Tick(float DeltaTime) override;
 
-// Called to bind functionality to input
 virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 };

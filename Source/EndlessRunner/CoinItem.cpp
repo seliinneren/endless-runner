@@ -8,7 +8,6 @@
 #include "RunnerCharacter.h"
 #include <Kismet/GameplayStatics.h>
 
-// Sets default values
 ACoinItem::ACoinItem()
 {
 	SceneComponent = CreateDefaultSubobject<USceneComponent>(TEXT("SceneComponent"));
@@ -28,7 +27,6 @@ ACoinItem::ACoinItem()
 
 }
 
-// Called when the game starts or when spawned
 void ACoinItem::BeginPlay()
 {
 	Super::BeginPlay();
