@@ -108,6 +108,10 @@ FVector2D TouchCurrent2D;
 UPROPERTY()
 bool bIsTouchTriggered = false;
 
+UPROPERTY()
+bool bCanJump = false;
+
+
 public:	
 
 UFUNCTION()
